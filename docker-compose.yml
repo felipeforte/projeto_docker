@@ -1,0 +1,84 @@
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: senha_root1234
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: senha_wordpress1234
+    volumes:
+      - mysql_dados:/var/lib/mysql
+    networks:
+      - wordpress_network
+
+  wordpress1:
+    image: wordpress:5.4.2-php7.2-apache
+    container_name: wordpress1
+    environment:
+      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: senha_wordpress1234 
+      WORDPRESS_TABLE_PREFIX: wp_
+    volumes:
+      - ./wordpress-dados:/var/www/html
+    depends_on:
+      - mysql
+    networks:
+      - wordpress_network
+
+  wordpress2:
+    image: wordpress:5.4.2-php7.2-apache
+    container_name: wordpress2
+    environment:
+      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: senha_wordpress1234 
+      WORDPRESS_TABLE_PREFIX: wp_
+    volumes:
+      - ./wordpress-dados:/var/www/html
+    depends_on:
+      - mysql
+    networks:
+      - wordpress_network
+
+  wordpress3:
+    image: wordpress:5.4.2-php7.2-apache
+    container_name: wordpress3
+    environment:
+      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: senha_wordpress1234 
+      WORDPRESS_TABLE_PREFIX: wp_
+    volumes:
+      - ./wordpress-dados:/var/www/html
+    depends_on:
+      - mysql
+    networks:
+      - wordpress_network
+
+  nginx:
+    image: nginx:1.19.0
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./wordpress-dados:/usr/share/nginx/html
+    depends_on:
+      - wordpress1
+      - wordpress2
+      - wordpress3
+    networks:
+      - wordpress_network
+
+volumes:
+  mysql_dados:
+    driver: local
+
+networks:
+  wordpress_network:
+    driver: bridge
