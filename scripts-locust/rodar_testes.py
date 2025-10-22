@@ -31,7 +31,7 @@ class ExecutorTestes:
             print(f"   ▶️  Executando: {' '.join(comando)}")
             
             # Executa dentro do container Locust
-            resultado = subprocess.run(comando, capture_output=True, text=True, timeout=400)
+            resultado = subprocess.run(comando, capture_output=True, text=True, timeout=60)
             
             if resultado.returncode == 0:
                 print(f"Teste {nome_teste} concluído com sucesso")
@@ -49,9 +49,9 @@ class ExecutorTestes:
             else:
                 print(f"Erro no teste {nome_teste} (código: {resultado.returncode})")
                 if resultado.stdout:
-                    print(f"   Stdout: {resultado.stdout[:500]}...")
+                    print(f"   Stdout: {resultado.stdout[:5000]}...")
                 if resultado.stderr:
-                    print(f"   Stderr: {resultado.stderr[:500]}...")
+                    print(f"   Stderr: {resultado.stderr[:5000]}...")
                 return False
                 
         except subprocess.TimeoutExpired:
@@ -74,14 +74,14 @@ class ExecutorTestes:
         self.resultados.append(dados_resultado)
     
     def testar(self):        
-        configuracoes_usuarios = [10, 100, 750]
+        configuracoes_usuarios = [20, 100, 750]
         
         print(f"\n===== INICIANDO TESTES =====")
         print("=" * 50)
         
         for usuarios in configuracoes_usuarios:
             taxa = max(1, usuarios // 10)
-            duracao = "1m"
+            duracao = "30s"
             nome_teste = f"wp_{self.n_instancias}inst_{usuarios}usuarios"
             
             print(f"\n📊 EXECUTANDO: {self.n_instancias} instância(s) + {usuarios} usuários")
@@ -99,23 +99,7 @@ class ExecutorTestes:
             else:
                 print(f"Pulando para próximo teste...")
         
-        self.gerar_resumo()
-    
-    def gerar_resumo(self):
-        arquivo_resumo = "resultados/resumo_testes.json"
-        try:
-            with open(arquivo_resumo, 'w', encoding='utf-8') as f:
-                json.dump(self.resultados, f, indent=2, ensure_ascii=False)
-            
-            print(f"\nResumo dos testes salvo em: {arquivo_resumo}")
-            
-            print("Arquivos de resultados gerados:")
-            for arquivo in os.listdir("resultados"):
-                print(f"   - {arquivo}")
-                
-            print("EXECUÇÃO CONCLUÍDA!")
-        except Exception as e:
-            print(f"Erro ao salvar resumo: {str(e)}")
+        print("EXECUÇÃO CONCLUÍDA!")
 
 if __name__ == "__main__":
     executor = ExecutorTestes()
