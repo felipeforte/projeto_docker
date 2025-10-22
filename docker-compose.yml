@@ -75,6 +75,26 @@ services:
     networks:
       - wordpress_network
 
+  locust:
+    image: grubykarol/locust
+    container_name: locust
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    environment:
+      - ATTACKED_HOST=http://nginx
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./scripts-locust:/locust
+      - .:/app
+    networks:
+      - wordpress_network
+    depends_on:
+      - nginx
+
+
 volumes:
   mysql_dados:
     driver: local
